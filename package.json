@@ -1,18 +1,18 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "quick-event",
-  "title": "Quick Event",
+  "name": "calendar-todo",
+  "title": "Calendar TODO",
   "version": "1.0.0",
   "description": "Create a calendar event using natural language",
   "icon": "command-icon.png",
-  "author": "mblode",
+  "author": "melkikh",
   "license": "MIT",
   "commands": [
     {
       "name": "index",
-      "title": "Create Quick Event",
+      "title": "Create TODO Event",
       "subtitle": "Calendar",
-      "description": "Create a new event in your calendar",
+      "description": "Create a new TODO event in your calendar",
       "mode": "view"
     }
   ],
@@ -30,8 +30,7 @@
     "@raycast/api": "^1.25.0",
     "date-fns": "^2.28.0",
     "dayjs": "^1.10.7",
-    "osascript-tag": "^0.1.2",
-    "sherlockjs": "^1.4.2"
+    "osascript-tag": "^0.1.2"
   },
   "devDependencies": {
     "@types/lodash.groupby": "^4.6.6",

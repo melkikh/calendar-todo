@@ -33,9 +33,17 @@ export const getStartDate = () => {
   return startDateNearest;
 };
 
+export const saturday = (date: Date) => {
+  const daytoset = 6;
+  const currentDay = date.getDay();
+  const distance = daytoset - currentDay;
+  date.setDate(date.getDate() + distance);
+  return date;
+}
+
 export const getEndDate = (startDate: Date) => {
   const endDate = new Date(startDate);
-  return addHours(endDate, 1);
+  return addMinutes(endDate, 30);
 };
 
 export const formatDate = (item: CalendarEvent): string => {

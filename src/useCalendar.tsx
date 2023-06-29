@@ -1,9 +1,8 @@
 import { randomId, showToast, ToastStyle } from '@raycast/api';
 import { useState } from 'react';
 import { CalendarEvent } from './types';
-import { getEndDate, getStartDate } from './dates';
+import { getEndDate, getStartDate, saturday } from './dates';
 import osascript from 'osascript-tag';
-import Sherlock from 'sherlockjs';
 
 export const executeJxa = async (script: string) => {
   try {
@@ -31,20 +30,19 @@ export function useCalendar() {
       if (query.length === 0) {
         setResults([]);
       } else {
-        const parsedEvent = Sherlock.parse(query);
+        
+        const todayStartDate = getStartDate();
+        const startDate = saturday(todayStartDate);
+        const endDate = getEndDate(startDate);
 
         const event: CalendarEvent = {
-          ...parsedEvent,
+          eventTitle: query,
+          isAllDay: false,
+          startDate: startDate,
+          endDate: endDate,
           id: randomId(),
+          validated: true
         };
-
-        if (!event.startDate) {
-          event.startDate = getStartDate();
-        }
-
-        if (!event.endDate) {
-          event.endDate = getEndDate(event.startDate);
-        }
 
         setResults([event]);
       }
