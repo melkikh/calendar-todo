@@ -1,6 +1,8 @@
 import { addHours, addMinutes, differenceInCalendarDays, format, roundToNearestMinutes } from 'date-fns';
 import { CalendarEvent } from './types';
 
+const eventDurationMinutes = 15;
+
 export const getHumanDateFormat = 'MMM dd, yyyy';
 export const getHumanTimeFormat = 'h:mm aa';
 
@@ -43,16 +45,5 @@ export const saturday = (date: Date) => {
 
 export const getEndDate = (startDate: Date) => {
   const endDate = new Date(startDate);
-  return addMinutes(endDate, 30);
-};
-
-export const formatDate = (item: CalendarEvent): string => {
-  if (item.isAllDay) {
-    return `${formatRelativeDay(item.startDate, new Date())} all-day`;
-  } else {
-    return `${formatRelativeDay(item.startDate, new Date())} from ${format(
-      item.startDate,
-      getHumanTimeFormat
-    )} to ${format(item.endDate, getHumanTimeFormat)}`;
-  }
+  return addMinutes(endDate, eventDurationMinutes);
 };

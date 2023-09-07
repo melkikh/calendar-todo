@@ -1,29 +1,40 @@
-import { ActionPanel, closeMainWindow, Icon, List, preferences } from '@raycast/api';
-import { formatDate } from './dates';
+import { ActionPanel, closeMainWindow, Icon, List, preferences, randomId } from '@raycast/api';
 import { CalendarEvent } from './types';
+import { getEndDate, getStartDate, saturday } from './dates';
 import { executeJxa, useCalendar } from './useCalendar';
 
 export default function Command() {
-  const { isLoading, results, parse } = useCalendar();
-
+  const { isLoading, calendarText, parse } = useCalendar();
   const calendars = String(preferences.calendars.value).split(',');
 
-  const createEvent = async (item: CalendarEvent, calendarName: string) => {
+  const createEvent = async (text: string, calendarName: string) => {
+    const todayStartDate = getStartDate();
+    const startDate = saturday(todayStartDate);
+    const endDate = getEndDate(startDate);
+
+    const event: CalendarEvent = {
+      eventTitle: text,
+      isAllDay: false,
+      startDate: startDate,
+      endDate: endDate,
+      validated: true
+    };
+
     executeJxa(`
       var app = Application.currentApplication()
       app.includeStandardAdditions = true
       var Calendar = Application("Calendar")
       
-      var eventStart = new Date(${item.startDate.getTime()})
-      var eventEnd = new Date(${item.endDate.getTime()})
+      var eventStart = new Date(${event.startDate.getTime()})
+      var eventEnd = new Date(${event.endDate.getTime()})
       
       var projectCalendars = Calendar.calendars.whose({name: "${calendarName}"})
       var projectCalendar = projectCalendars[0]
       var event = Calendar.Event({
-        summary: "${item.eventTitle}", 
+        summary: "${event.eventTitle}", 
         startDate: eventStart, 
         endDate: eventEnd, 
-        alldayEvent: ${item.isAllDay},
+        alldayEvent: ${event.isAllDay},
       })
       projectCalendar.events.push(event)
     `);
@@ -32,28 +43,26 @@ export default function Command() {
       var app = Application.currentApplication()
       app.includeStandardAdditions = true
       var Calendar = Application("Calendar")
-      var date = new Date(${item.startDate.getTime()})
+      var date = new Date(${event.startDate.getTime()})
       Calendar.viewCalendar({at: date})
     `);
   };
 
   return (
-    <List isLoading={isLoading} onSearchTextChange={parse} searchBarPlaceholder="E.g. Movie at 7pm on Friday" throttle>
+    <List isLoading={isLoading} onSearchTextChange={parse} searchBarPlaceholder="write a meeting summary" throttle>
       <List.Section title="Your quick event">
-        {results.map((item) => (
           <List.Item
-            key={item.id}
-            title={item.eventTitle}
-            subtitle={formatDate(item)}
+            key={randomId()}
+            title={calendarText}
             icon={Icon.Calendar}
             actions={
               <ActionPanel>
-                {calendars.map((calendar, index) => (
+                {calendars.map((calendar, calendarIndex) => (
                   <ActionPanel.Item
-                    key={index}
+                    key={calendarIndex}
                     title={`Add to '${calendar}' Calendar`}
                     onAction={async () => {
-                      await createEvent(item, calendar);
+                      await createEvent(calendarText, calendar);
                       await closeMainWindow({ clearRootSearch: true });
                     }}
                     icon={{ source: Icon.Calendar }}
@@ -62,7 +71,6 @@ export default function Command() {
               </ActionPanel>
             }
           />
-        ))}
       </List.Section>
     </List>
   );
